@@ -3,7 +3,7 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 5000;
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 app.use(cors());
@@ -21,14 +21,23 @@ async function run() {
 
         const todoCollection = client.db('simple-todo').collection('todo')
 
+        // all todo get api
         app.get('/todo', async (req, res) => {
             const allTodo = await todoCollection.find().toArray()
             res.send(allTodo)
         })
-
+        // todo post api
         app.post('/todo', async (req, res) => {
             const todo = req.body;
             const result = await todoCollection.insertOne(todo)
+            res.send(result)
+        })
+
+        // todo delete api
+        app.delete('/todo/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await todoCollection.deleteOne(query)
             res.send(result)
         })
 
